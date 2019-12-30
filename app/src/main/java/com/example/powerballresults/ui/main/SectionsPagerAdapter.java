@@ -1,5 +1,6 @@
 package com.example.powerballresults.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
@@ -7,6 +8,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.example.powerballresults.Fragment1;
 import com.example.powerballresults.Fragment2;
@@ -22,8 +24,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     private final Context mContext;
 
+    @SuppressLint("WrongConstant")
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
-        super(fm);
+        super(fm, FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mContext = context;
     }
 

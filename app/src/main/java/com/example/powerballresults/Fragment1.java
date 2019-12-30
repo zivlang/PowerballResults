@@ -71,6 +71,7 @@ public class Fragment1 extends Fragment {
         View view = inflater.inflate(R.layout.layout_fragment1, container, false);
 
         Button filterLimitBtn = view.findViewById(R.id.filterLimitBtnId);
+        Button resetBtn = view.findViewById(R.id.resetBtnId);
 
         resultsAdapter = new ResultsAdapter(context);
         RecyclerView rv = view.findViewById(R.id.rvId);
@@ -86,6 +87,22 @@ public class Fragment1 extends Fragment {
         rv.setAdapter(resultsAdapter);
 
         resultsAdapter.attachResultsList(resultsList);
+
+        resetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadOriginal = true;
+                try {
+                    new GetJson().execute().get();
+                    resultsAdapter.attachResultsList(resultsList);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         filterLimitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,7 +232,7 @@ public class Fragment1 extends Fragment {
         entireListArray = datesArrayList.toArray(new String[0]);
 
         adapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_dropdown_item, entireListArray);
+                R.layout.spinner_style, entireListArray);
         spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
