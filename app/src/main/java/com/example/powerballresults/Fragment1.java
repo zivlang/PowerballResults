@@ -157,7 +157,7 @@ public class Fragment1 extends Fragment {
                             throw new NumberFormatException(null);
                         }
                     } catch (NumberFormatException e) {
-                        Toast.makeText(context, "Type an integer between 0 and " + resultsAdapter.getItemCount(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Type an integer between 0 and 1000", Toast.LENGTH_SHORT).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
