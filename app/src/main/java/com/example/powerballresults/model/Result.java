@@ -38,7 +38,6 @@ public class Result implements Parcelable {
 
     public void setRedNumber(String redNumber) {
         this.redNumber = redNumber;
-        System.out.println("red: "+redNumber);
     }
 
     public String getDate() {
