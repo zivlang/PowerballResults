@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PowerballResults</string>
+    <string name="tab_text_1">Historic results</string>
+    <string name="tab_text_2">Tab 2</string>
+</resources>

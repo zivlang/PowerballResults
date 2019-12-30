@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by date:"
+                android:textSize="15dp"
+                android:textColor="@color/colorPrimary">
+            </TextView>
+            <EditText
+                android:textSize="15dp"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dateId"
+                android:hint="yyyy-MM-dd"
+                >
+            </EditText>
+            <Button
+                android:id="@+id/dateBtnId"
+                android:layout_margin="5dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="filter">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Limit results amount:"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15dp">
+            </TextView>
+            <EditText
+                android:textSize="15dp"
+                android:id="@+id/resultsNumberId"
+                android:hint="Type a number"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+            </EditText>
+            <Button
+                android:id="@+id/resultsNumberBtnId"
+                android:layout_margin="5dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="get results">
+            </Button>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="date"
+                android:textColor="#000000" />
+            <TextView
+                android:textAlignment="center"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_weight=".1"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="first numbers"
+                android:textColor="#000000" />
+            <TextView
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="red"
+                android:textColor="#000000" />
+
+        </LinearLayout>
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvId"
+        android:layout_marginLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp">
+    </androidx.recyclerview.widget.RecyclerView>
+</LinearLayout>
