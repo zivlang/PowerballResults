@@ -1,19 +1,21 @@
 package com.example.powerballresults;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,22 +35,23 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 public class Fragment1 extends Fragment {
 
-    private AsyncTask<String, String, String> getJson;
-
     private Context context;
 
+    private AlertDialog filterDialog;
+    private EditText resultsNumberView;
     private ArrayList<Result> resultsList;
     private ResultsAdapter resultsAdapter;
 
     private int listCount = 1000;
-    private static final int PERMISSION_REQUEST_CODE = 200;
 
-    private boolean loadOriginal = true;
-    private String typedDate, modifiedUrl;
+    private boolean loadOriginal = true, dateSelected;
+    private String modifiedUrl;
+    private String jsonString;
     private String originalUrl = "https://data.ny.gov/resource/d6yy-54nr.json";
 
     @Nullable
@@ -67,10 +70,7 @@ public class Fragment1 extends Fragment {
 
         View view = inflater.inflate(R.layout.layout_fragment1, container, false);
 
-        final EditText dateView = view.findViewById(R.id.dateId);
-        final EditText resultsNumberView = view.findViewById(R.id.resultsNumberId);
-        Button dateBtn = view.findViewById(R.id.dateBtnId);
-        Button resultsNumberBtn = view.findViewById(R.id.resultsNumberBtnId);
+        Button filterLimitBtn = view.findViewById(R.id.filterLimitBtnId);
 
         resultsAdapter = new ResultsAdapter(context);
         RecyclerView rv = view.findViewById(R.id.rvId);
@@ -85,89 +85,162 @@ public class Fragment1 extends Fragment {
         rv.addItemDecoration(dividerItemDecoration);
         rv.setAdapter(resultsAdapter);
 
-//        new GetJson().execute();
-
         resultsAdapter.attachResultsList(resultsList);
 
-        dateBtn.setOnClickListener(new View.OnClickListener() {
+        filterLimitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                typedDate = dateView.getText().toString();
+                loadOriginal = true;
 
-                if (typedDate.isEmpty()) {
-                    loadOriginal = true;
+                if(resultsList.size() < listCount) {
                     try {
                         new GetJson().execute().get();
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    resultsAdapter.attachResultsList(resultsList);
-//                    resultsAdapter.notifyDataSetChanged();
-                } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        dateFormat.parse(typedDate);
-                        modifiedUrl = originalUrl + "?draw_date=" + typedDate;
-                        loadOriginal = false;
-                        new GetJson().execute().get();
-
-                        resultsAdapter.attachResultsList(resultsList);
-                        if(resultsList.size() == 0){
-                            Toast.makeText(context, "No record was found for this date", Toast.LENGTH_SHORT).show();
-                        }
-//                        resultsAdapter.notifyDataSetChanged();
-                    } catch (ParseException e) {
-                        Toast.makeText(context, "Type numbers in the following pattern: yyyy-MM-dd", Toast.LENGTH_LONG).show();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
                 }
-            }
-        });
 
-        resultsNumberBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                View inflatedView = LayoutInflater.from(context)
+                        .inflate(R.layout.dialog_filter,null,false);
 
-                String typedNumber = resultsNumberView.getText().toString();
+                final Spinner spinner = inflatedView.findViewById(R.id.spinnerId);
+                final EditText resultsNumberView = inflatedView.findViewById(R.id.resultsNumberId);
+                final Button alertBtn = inflatedView.findViewById(R.id.alertBtnId);
 
-                if (typedNumber.isEmpty()) {
-                    loadOriginal = true;
-                    try {
-                        new GetJson().execute().get();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    resultsAdapter.attachResultsList(resultsList);
-                } else {
-                    try {
-                        int toInt = Integer.parseInt(typedNumber);
-                        if (toInt <= listCount && toInt >= 0) {
-                            modifiedUrl = originalUrl + "?&$limit=" + typedNumber;
-                            new GetJson().execute().get();
-                            resultsAdapter.attachResultsList(resultsList);
-                        } else {
-                            throw new NumberFormatException(null);
-                        }
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(context, "Type an integer between 0 and 1000", Toast.LENGTH_SHORT).show();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+                dialogBuilder.setView(inflatedView);
+
+                filterDialog = dialogBuilder.show();
+
+                try {
+                    getSpinner(spinner);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
+                alertBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(dateSelected) {
+                            processDate(spinner);
+                        }
+                        else {
+                            processNumber(resultsNumberView);
+                        }
+                    }
+                });
             }
         });
-    return view;
+        return view;
     }
+
+    private void processDate(Spinner spinner) {
+
+        String selectedDate = spinner.getSelectedItem().toString();
+        try {
+            modifiedUrl = originalUrl + "?draw_date=" + selectedDate;
+            loadOriginal = false;
+            new GetJson().execute().get();
+            resultsAdapter.attachResultsList(resultsList);
+            filterDialog.dismiss();
+            //                        resultsAdapter.notifyDataSetChanged();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void processNumber(EditText resultsNumberView){
+
+        String typedNumber = resultsNumberView.getText().toString();
+
+        if (typedNumber.isEmpty()) {
+            loadOriginal = true;
+            try {
+                new GetJson().execute().get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            resultsAdapter.attachResultsList(resultsList);
+            filterDialog.dismiss();
+        } else {
+            loadOriginal = false;
+            try {
+                int toInt = Integer.parseInt(typedNumber);
+                if (toInt <= listCount && toInt >= 0) {
+                    modifiedUrl = originalUrl + "?&$limit=" + typedNumber;
+                    new GetJson().execute().get();
+                    resultsAdapter.attachResultsList(resultsList);
+                    filterDialog.dismiss();
+                } else {
+                    throw new NumberFormatException(null);
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(context, "Type an integer between 0 and " + listCount, Toast.LENGTH_SHORT).show();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void getSpinner(Spinner spinner) throws JSONException {
+
+        ArrayAdapter<String> adapter;
+        ArrayList<String> datesArrayList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray(jsonString);
+
+        String dateString;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+
+            JSONObject resultObject = jsonArray.getJSONObject(i);
+            dateString = resultObject.getString("draw_date").substring(0, 10);
+            datesArrayList.add(dateString);
+        }
+
+        String[] listFirstItem = new String[1];
+        listFirstItem[0] = "";
+
+        String[] entireListArray;
+
+        datesArrayList.add(0, Arrays.toString(listFirstItem).replace("[", "").replace("]", ""));
+        entireListArray = datesArrayList.toArray(new String[0]);
+
+        adapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_dropdown_item, entireListArray);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position != 0) {
+                    dateSelected = true;
+                    if(resultsNumberView == null) {
+                        return;
+                    }
+                    resultsNumberView.getText().clear();
+                }
+                else {
+                    dateSelected = false;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
 
     public class GetJson extends AsyncTask<String,String,String> {
 
@@ -176,20 +249,20 @@ public class Fragment1 extends Fragment {
 
             if(loadOriginal) {
                 try {
-                    resultsList = getResultsArray(originalUrl);
+                    jsonString = getJsonString(originalUrl);
+                    resultsList = getResultsArray(jsonString);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                loadOriginal = false;
             }
 
             else{
                 try {
-                    resultsList = getResultsArray(modifiedUrl);
+                    jsonString = getJsonString(modifiedUrl);
+                    resultsList = getResultsArray(jsonString);
                 } catch (IOException e) {
-                    Toast.makeText(context, "No such date is found in the data", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -204,7 +277,7 @@ public class Fragment1 extends Fragment {
             resultsAdapter.notifyDataSetChanged();
         }
 
-        private ArrayList<Result> getResultsArray(String url) throws IOException, JSONException {
+        private String getJsonString(String url) throws IOException {
 
             HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
             //an object that reads from the internet
@@ -217,11 +290,13 @@ public class Fragment1 extends Fragment {
             }
             //Close our InputStream and Buffered reader
             bufferedReader.close();
-            String jsonString = fullJSON.toString();
 
-            ArrayList<Result> resultsArrayList = new ArrayList<>();
+            return fullJSON.toString();
+        }
 
-            JSONArray resultsArray = new JSONArray(jsonString);
+        private ArrayList<Result> getResultsArray(String jsonString) throws JSONException {
+        ArrayList<Result> resultsArrayList = new ArrayList<>();
+        JSONArray resultsArray = new JSONArray(jsonString);
 
             for (int i = 0; i < resultsArray.length(); i++) {
 
