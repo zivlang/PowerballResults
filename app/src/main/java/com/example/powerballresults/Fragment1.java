@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,7 +126,7 @@ public class Fragment1 extends Fragment {
                         .inflate(R.layout.dialog_filter,null,false);
 
                 final Spinner spinner = inflatedView.findViewById(R.id.spinnerId);
-                final EditText resultsNumberView = inflatedView.findViewById(R.id.resultsNumberId);
+                resultsNumberView = inflatedView.findViewById(R.id.resultsNumberId);
                 final Button alertBtn = inflatedView.findViewById(R.id.alertBtnId);
 
                 final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
@@ -138,6 +140,23 @@ public class Fragment1 extends Fragment {
                     e.printStackTrace();
                 }
 
+                resultsNumberView.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        dateSelected = false;
+                        spinner.setSelection(0);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
                 alertBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -163,7 +182,6 @@ public class Fragment1 extends Fragment {
             new GetJson().execute().get();
             resultsAdapter.attachResultsList(resultsList);
             filterDialog.dismiss();
-            //                        resultsAdapter.notifyDataSetChanged();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -242,6 +260,7 @@ public class Fragment1 extends Fragment {
 
                 if(position != 0) {
                     dateSelected = true;
+                    resultsAdapter.attachResultsList(resultsList);
                     if(resultsNumberView == null) {
                         return;
                     }
