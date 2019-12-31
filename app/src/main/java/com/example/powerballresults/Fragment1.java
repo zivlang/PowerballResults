@@ -148,8 +148,9 @@ public class Fragment1 extends Fragment {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        dateSelected = false;
-                        spinner.setSelection(0);
+                        if(!resultsNumberView.getText().toString().isEmpty()) {
+                            spinner.setSelection(0);
+                        }
                     }
 
                     @Override
@@ -260,11 +261,11 @@ public class Fragment1 extends Fragment {
 
                 if(position != 0) {
                     dateSelected = true;
-                    resultsAdapter.attachResultsList(resultsList);
                     if(resultsNumberView == null) {
                         return;
                     }
                     resultsNumberView.getText().clear();
+                    resultsAdapter.attachResultsList(resultsList);
                 }
                 else {
                     dateSelected = false;
