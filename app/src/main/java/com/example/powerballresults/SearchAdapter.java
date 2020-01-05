@@ -19,7 +19,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     private Context context;
     private List<SearchResult> outputList;
 
-    public SearchAdapter(Context context) {
+    SearchAdapter(Context context) {
         this.context = context;
         outputList = new ArrayList<>();
     }
@@ -64,7 +64,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         }
         else if(regularNumbers == 0 && red){
             holder.numbersCount.setText("");
-            holder.red.setText(" a red ball");
+            holder.red.setText(" won a red ball");
         }
     }
 
@@ -73,7 +73,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return outputList.size();
     }
 
-    public void attachList(ArrayList<SearchResult> searchOutput) {
+    void attachList(ArrayList<SearchResult> searchOutput) {
         this.outputList = searchOutput;
     }
 }
