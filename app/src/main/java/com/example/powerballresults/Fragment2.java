@@ -89,7 +89,7 @@ public class Fragment2 extends Fragment {
                 text = et.getText().toString();
 
                 if (!text.matches("[0-9 / ]+") && length > 0) {
-                    Toast.makeText(getActivity(), "Only digits and spaces between them can be used", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Use only digits and spaces", Toast.LENGTH_SHORT).show();
                     StringBuilder sb = new StringBuilder(text);
                     sb = sb.deleteCharAt(text.length() - 1);
                     et.setText(sb.toString());
@@ -128,7 +128,7 @@ public class Fragment2 extends Fragment {
 
         SearchResult searchResult;
         //iterating over each nested array
-        for(int i = 1; i<winsArraysArray.length; i++){
+        for(int i = 1; i < winsArraysArray.length; i++){
             for (int j = 0; j < winsArraysArray[i].length - 1; j++) {
                 //iterating over the array of typed numbers
                 for(int k = 0; k < typedNumbersArray.length - 1; k++) {
