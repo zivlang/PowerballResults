@@ -2,7 +2,6 @@ package com.example.powerballresults;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,13 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -44,6 +36,8 @@ public class Fragment1 extends Fragment {
 
     private Context context;
 
+    private GetJson getJson;
+
     private AlertDialog filterDialog;
     private EditText resultsNumberView;
     private ArrayList<Result> resultsList;
@@ -51,7 +45,7 @@ public class Fragment1 extends Fragment {
 
     private int listCount = 1000;
 
-    private boolean loadOriginal = true, dateSelected;
+    private boolean dateSelected;
     private String modifiedUrl;
     private String jsonString;
     private String originalUrl = "https://data.ny.gov/resource/d6yy-54nr.json";
@@ -63,8 +57,10 @@ public class Fragment1 extends Fragment {
         context = getActivity();
 
         try {
-            new GetJson().execute().get();
-        } catch (ExecutionException e) {
+            getJson = new GetJson(originalUrl);
+            jsonString = getJson.jsonString;
+            resultsList = getResultsArray();
+        } catch (ExecutionException | JSONException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -93,11 +89,13 @@ public class Fragment1 extends Fragment {
         resetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadOriginal = true;
                 try {
-                    new GetJson().execute().get();
+                    getJson = new GetJson(originalUrl);
+                    jsonString = getJson.jsonString;
+                    resultsList = getResultsArray();
                     resultsAdapter.attachResultsList(resultsList);
-                } catch (ExecutionException e) {
+                    resultsAdapter.notifyDataSetChanged();
+                } catch (ExecutionException | JSONException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -105,16 +103,12 @@ public class Fragment1 extends Fragment {
             }
         });
 
-
         filterLimitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                loadOriginal = true;
-
                 if(resultsList.size() < listCount) {
                     try {
-                        new GetJson().execute().get();
+                        new GetJson(originalUrl);
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -136,14 +130,13 @@ public class Fragment1 extends Fragment {
 
                 try {
                     getSpinner(spinner);
-                } catch (JSONException e) {
+                } catch (JSONException | ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 resultsNumberView.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                     }
 
                     @Override
@@ -155,7 +148,6 @@ public class Fragment1 extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-
                     }
                 });
                 alertBtn.setOnClickListener(new View.OnClickListener() {
@@ -179,13 +171,17 @@ public class Fragment1 extends Fragment {
         String selectedDate = spinner.getSelectedItem().toString();
         try {
             modifiedUrl = originalUrl + "?draw_date=" + selectedDate;
-            loadOriginal = false;
-            new GetJson().execute().get();
+            getJson = new GetJson(modifiedUrl);
+            jsonString = getJson.jsonString;
+            resultsList = getResultsArray();
             resultsAdapter.attachResultsList(resultsList);
+            resultsAdapter.notifyDataSetChanged();
             filterDialog.dismiss();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -195,29 +191,31 @@ public class Fragment1 extends Fragment {
         String typedNumber = resultsNumberView.getText().toString();
 
         if (typedNumber.isEmpty()) {
-            loadOriginal = true;
             try {
-                new GetJson().execute().get();
-            } catch (ExecutionException e) {
+                getJson = new GetJson(originalUrl);
+                jsonString = getJson.jsonString;
+                resultsList = getResultsArray();
+                resultsAdapter.attachResultsList(resultsList);
+            } catch (ExecutionException | JSONException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            resultsAdapter.attachResultsList(resultsList);
             filterDialog.dismiss();
         } else {
-            loadOriginal = false;
             try {
                 int toInt = Integer.parseInt(typedNumber);
                 if (toInt <= listCount && toInt >= 0) {
                     modifiedUrl = originalUrl + "?&$limit=" + typedNumber;
-                    new GetJson().execute().get();
+                    getJson = new GetJson(modifiedUrl);
+                    jsonString = getJson.jsonString;
+                    resultsList = getResultsArray();
                     resultsAdapter.attachResultsList(resultsList);
                     filterDialog.dismiss();
                 } else {
                     throw new NumberFormatException(null);
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException | JSONException e) {
                 Toast.makeText(context, "Type an integer between 0 and " + listCount, Toast.LENGTH_SHORT).show();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -227,11 +225,31 @@ public class Fragment1 extends Fragment {
         }
     }
 
-    private void getSpinner(Spinner spinner) throws JSONException {
+    private ArrayList<Result> getResultsArray() throws JSONException {
+        ArrayList<Result> resultsArrayList = new ArrayList<>();
+        JSONArray resultsArray = new JSONArray(jsonString);
+
+        for (int i = 0; i < resultsArray.length(); i++) {
+
+            Result result = new Result();
+
+            JSONObject resultObject = resultsArray.getJSONObject(i);
+            result.setDate(resultObject.getString("draw_date").substring(0,10));
+            result.setFirstNumbers(resultObject.getString("winning_numbers").substring(0,15));
+            result.setRedNumber(resultObject.getString("winning_numbers").substring(15,17));
+
+            resultsArrayList.add(result);
+        }
+
+        return resultsArrayList;
+    }
+
+    private void getSpinner(Spinner spinner) throws JSONException, ExecutionException, InterruptedException {
 
         ArrayAdapter<String> adapter;
         ArrayList<String> datesArrayList = new ArrayList<>();
-        JSONArray jsonArray = new JSONArray(jsonString);
+        getJson = new GetJson(originalUrl);
+        JSONArray jsonArray = new JSONArray(getJson.jsonString);
 
         String dateString;
 
@@ -247,7 +265,8 @@ public class Fragment1 extends Fragment {
 
         String[] entireListArray;
 
-        datesArrayList.add(0, Arrays.toString(listFirstItem).replace("[", "").replace("]", ""));
+        datesArrayList.add(0, Arrays.toString(listFirstItem)
+                .replace("[", "").replace("]", ""));
         entireListArray = datesArrayList.toArray(new String[0]);
 
         adapter = new ArrayAdapter<>(context,
@@ -276,78 +295,5 @@ public class Fragment1 extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-    }
-
-
-    public class GetJson extends AsyncTask<String,String,String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-
-            if(loadOriginal) {
-                try {
-                    jsonString = getJsonString(originalUrl);
-                    resultsList = getResultsArray(jsonString);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            else{
-                try {
-                    jsonString = getJsonString(modifiedUrl);
-                    resultsList = getResultsArray(jsonString);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            resultsAdapter.notifyDataSetChanged();
-        }
-
-        private String getJsonString(String url) throws IOException {
-
-            HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-            //an object that reads from the internet
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            StringBuilder fullJSON = new StringBuilder(); // a string that will hold the JSON
-            String line; // will hold a certain line from the JSON
-            while ((line = bufferedReader.readLine()) != null) { //unless the read line is null,
-                // it's being saved in line
-                fullJSON.append(line); // adding the read line to the already saved string
-            }
-            //Close our InputStream and Buffered reader
-            bufferedReader.close();
-
-            return fullJSON.toString();
-        }
-
-        private ArrayList<Result> getResultsArray(String jsonString) throws JSONException {
-        ArrayList<Result> resultsArrayList = new ArrayList<>();
-        JSONArray resultsArray = new JSONArray(jsonString);
-
-            for (int i = 0; i < resultsArray.length(); i++) {
-
-                Result result = new Result();
-
-                JSONObject resultObject = resultsArray.getJSONObject(i);
-                result.setDate(resultObject.getString("draw_date").substring(0, 10));
-                result.setFirstNumbers(resultObject.getString("winning_numbers").substring(0,15));
-                result.setRedNumber(resultObject.getString("winning_numbers").substring(15,17));
-
-                resultsArrayList.add(result);
-            }
-
-            return resultsArrayList;
-        }
     }
 }

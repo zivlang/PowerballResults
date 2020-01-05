@@ -39,10 +39,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvId"
-        android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="450dp"
-        android:layout_marginStart="10dp">
+        >
     </androidx.recyclerview.widget.RecyclerView>
     <LinearLayout
         android:layout_width="match_parent"

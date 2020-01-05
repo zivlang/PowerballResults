@@ -33,7 +33,7 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ViewHold
         return new ViewHolder(cell);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView date, firstNumbers, redNumber;
 
@@ -41,7 +41,7 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ViewHold
             super(itemView);
             firstNumbers = itemView.findViewById(R.id.firstNumbersId);
             redNumber = itemView.findViewById(R.id.redNumberId);
-            date = itemView.findViewById(R.id.rowDateId);
+            date = itemView.findViewById(R.id.rowResultDateId);
         }
     }
     @Override
