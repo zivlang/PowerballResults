@@ -7,15 +7,11 @@ import java.util.ArrayList;
 
 public class SearchResult implements Parcelable {
 
-//    private ArrayList<String> searchWins;
-//    private ArrayList<String> searchDates;
     private boolean redOrNot;
     private int numberCount;
     private String dateString;
 
     public SearchResult(Parcel in) {
-//        searchWins = in.createStringArrayList();
-//        searchDates = in.createStringArrayList();
         redOrNot = in.readByte() != 0;
         numberCount = in.readInt();
         dateString = in.readString();
@@ -26,8 +22,6 @@ public class SearchResult implements Parcelable {
     @Override
     public String toString() {
         return "SearchResult{" +
-//                "searchWins=" + searchWins +
-//                ", searchDates=" + searchDates +
                 ", redOrNot=" + redOrNot +
                 ", numberCount=" + numberCount +
                 ", dateString='" + dateString + '\'' +
@@ -60,8 +54,6 @@ public class SearchResult implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeStringList(searchWins);
-//        dest.writeStringList(searchDates);
         dest.writeByte((byte) (redOrNot ? 1 : 0));
         dest.writeInt(numberCount);
         dest.writeString(dateString);
