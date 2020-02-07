@@ -29,8 +29,6 @@ import java.util.concurrent.ExecutionException;
 
 public class Fragment2 extends Fragment {
 
-    private GetJson getJson;
-
     private String text;
     private ArrayList<SearchResult> searchResultsList;
 
@@ -202,7 +200,7 @@ public class Fragment2 extends Fragment {
         JSONArray jsonArray = null;
         try {
             String originalUrl = "https://data.ny.gov/resource/d6yy-54nr.json";
-            getJson = new GetJson(originalUrl);
+            GetJson getJson = new GetJson(originalUrl);
             jsonArray = new JSONArray(getJson.jsonString);
             winsArraysArray = new int[jsonArray.length()][6];
             datesArray = new String[jsonArray.length()];

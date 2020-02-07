@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="20sp"
 
         android:text="date"
         android:textColor="#000000" />
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:textAlignment="center"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:text="firstNumbers"
         android:textColor="#000000" />
     <TextView
@@ -31,7 +31,7 @@
         android:id="@+id/redNumberId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:text="red"
         android:textColor="#ff0000"
         android:gravity="start" />

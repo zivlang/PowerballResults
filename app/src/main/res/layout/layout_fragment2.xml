@@ -9,16 +9,16 @@
         android:layout_height="wrap_content"
         android:text="Type numbers to find their winning history"
         android:textAlignment="center"
-        android:textSize="35dp"
+        android:textSize="35sp"
         android:textColor="@color/colorPrimary">
     </TextView>
     <TextView
         android:layout_width="match_parent"
         android:layout_margin="5dp"
         android:layout_height="wrap_content"
-        android:text="Use commas to separate numbers"
+        android:text="Use spaces to separate numbers"
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textColor="@color/colorPrimary">
     </TextView>
     <LinearLayout
@@ -36,7 +36,7 @@
             android:padding="5dp"
             android:background="@drawable/text_edit"
             android:layout_margin="5dp"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textColor="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
