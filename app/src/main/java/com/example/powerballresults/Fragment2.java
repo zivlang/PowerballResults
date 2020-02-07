@@ -80,9 +80,6 @@ public class Fragment2 extends Fragment {
                         else if(length != 5) {
                             Toast.makeText(getActivity(), "Type " + (6 - length) + " more numbers", Toast.LENGTH_SHORT).show();
                             et.append(" ");
-
-//                            if(text.substring(length - 1, length).matches("[ ]"))
-//                                erase();
                         }
                         else {
                             et.append(" ");
@@ -122,9 +119,6 @@ public class Fragment2 extends Fragment {
                 if(length > 0 && text.substring(0, 1).matches("[ ]")){
                     erase();
                 }
-//                if(text.matches("[0-9 / ]+")){
-//                    typedNumbersArray = stringToIntArray(text);
-//                }
 
                 if(length > 2 && text.substring(length - 2, length - 1).matches("[ ]") && text.substring(length - 1, length).matches("[ ]")) {
                     erase();
