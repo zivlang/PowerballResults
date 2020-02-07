@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <EditText
+            android:hint="Type numbers here"
             android:layout_weight="1"
             android:layout_gravity="center"
             android:textAlignment="center"
@@ -53,6 +54,5 @@
         android:id="@+id/searchRvId"
         android:layout_width="match_parent"
         android:layout_height="443dp">
-
     </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>

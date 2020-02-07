@@ -5,9 +5,6 @@ import android.os.Parcelable;
 
 public class Result implements Parcelable {
 
-    public static final String RESULT = "firstNumbers";
-    public static final String DATE = "date";
-
     private String firstNumbers;
     private String redNumber;
     private String date;

@@ -240,7 +240,6 @@ public class Fragment1 extends Fragment {
 
             resultsArrayList.add(result);
         }
-
         return resultsArrayList;
     }
 

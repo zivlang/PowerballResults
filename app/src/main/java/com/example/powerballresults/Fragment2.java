@@ -58,21 +58,52 @@ public class Fragment2 extends Fragment {
 
         context = getActivity();
 
+        length = et.getText().length();
+
+        text = et.getText().toString();
+
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                typedNumbersArray = stringToIntArray(et.getText().toString());
-                if(typedNumbersArray.length > 6){
-                    Toast.makeText(getActivity(), "The search includes up to 6 numbers", Toast.LENGTH_SHORT).show();
+                String text = et.getText().toString();
+                if(length != 0){
+                    if(text.substring(length - 1).matches("[ ]")){
+                        System.out.println("matches:  ");
+                        erase();
+                    }
+                    typedNumbersArray = stringToIntArray(et.getText().toString());
+                    length = typedNumbersArray.length;
+                    if(length < 6){
+                        if(length == 0){
+                            Toast.makeText(getActivity(), "No numbers were typed", Toast.LENGTH_SHORT).show();
+                        }
+                        else if(length != 5) {
+                            Toast.makeText(getActivity(), "Type " + (6 - length) + " more numbers", Toast.LENGTH_SHORT).show();
+                            et.append(" ");
+
+//                            if(text.substring(length - 1, length).matches("[ ]"))
+//                                erase();
+                        }
+                        else {
+                            et.append(" ");
+                            Toast.makeText(getActivity(), "Type 1 more number", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    if(typedNumbersArray.length > 6){
+                        Toast.makeText(getActivity(), "The search includes up to 6 numbers", Toast.LENGTH_SHORT).show();
+                    }
+                    if(length == 6) {
+                        try {
+                            getWinsFromJson();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        alignArrays();
+                        showResults(view);
+                    }
                 }
                 else {
-                    try {
-                        getWinsFromJson();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    alignArrays();
-                    showResults(view);
+                    Toast.makeText(getActivity(), "No numbers were typed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -88,12 +119,19 @@ public class Fragment2 extends Fragment {
 
                 text = et.getText().toString();
 
+                if(length > 0 && text.substring(0, 1).matches("[ ]")){
+                    erase();
+                }
+//                if(text.matches("[0-9 / ]+")){
+//                    typedNumbersArray = stringToIntArray(text);
+//                }
+
+                if(length > 2 && text.substring(length - 2, length - 1).matches("[ ]") && text.substring(length - 1, length).matches("[ ]")) {
+                    erase();
+                }
                 if (!text.matches("[0-9 / ]+") && length > 0) {
-                    Toast.makeText(getActivity(), "Use only digits and spaces", Toast.LENGTH_SHORT).show();
-                    StringBuilder sb = new StringBuilder(text);
-                    sb = sb.deleteCharAt(text.length() - 1);
-                    et.setText(sb.toString());
-                    et.setSelection(length);
+                    Toast.makeText(getActivity(), "Use digits only", Toast.LENGTH_SHORT).show();
+                    erase();
                 }
             }
 
@@ -103,6 +141,12 @@ public class Fragment2 extends Fragment {
         return view;
     }
 
+    private void erase() {
+        StringBuilder sb = new StringBuilder(text);
+        sb = sb.deleteCharAt(text.length() - 1);
+        et.setText(sb.toString());
+        et.setSelection(length);
+    }
     private void showResults(View view) {
 
         SearchAdapter searchAdapter = new SearchAdapter(context);
@@ -146,7 +190,7 @@ public class Fragment2 extends Fragment {
             }
             // checking if the winning criteria are met
             if (red || count > 2) {
-                // if so, the search result are saved
+                // if so, the search results are saved
                 searchResult = new SearchResult();
                 searchResult.setNumberCount(count);
                 searchResult.setDateString(datesArray[i]);

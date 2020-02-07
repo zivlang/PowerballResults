@@ -46,25 +46,25 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.date.setText(outputList.get(position).getDateString()+":");
+        holder.date.setText(outputList.get(position).getDateString()+": ");
         int regularNumbers = outputList.get(position).getNumberCount();
         boolean red = outputList.get(position).isRedOrNot();
         if(regularNumbers > 1){
-            holder.numbersCount.setText(" won "+ outputList.get(position).getNumberCount() +" regular numbers");
+            holder.numbersCount.setText(outputList.get(position).getNumberCount() +" regular numbers");
             if(red) {
-                holder.red.setText(" + a red ball");
+                holder.red.setText(" and a red number");
             }
             else{
                 holder.red.setText("");
             }
         }
         else if(regularNumbers == 1 && red){
-            holder.numbersCount.setText(" won "+ outputList.get(position).getNumberCount() +" regular number");
-            holder.red.setText(" + a red ball");
+            holder.numbersCount.setText(outputList.get(position).getNumberCount() +" regular number");
+            holder.red.setText(" and a red number");
         }
         else if(regularNumbers == 0 && red){
             holder.numbersCount.setText("");
-            holder.red.setText(" won a red ball");
+            holder.red.setText("A red number");
         }
     }
 
